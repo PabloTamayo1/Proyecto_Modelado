@@ -21,16 +21,16 @@ else:
 
 # Establecer conexión con MongoDB para guardar los datos
 client_save = MongoClient('mongodb://localhost:27025')
-db_save = client_save['ProyectV1']
-collection_save = db_save['healthRead']
+db_save = client_save['ProyectV1Read']
+collection_save = db_save['health1']
 
 #Proceso ETL (TRANSFORMACION)
 # Cambiar el nombre de una columna
 df.describe()
-df.rename(columns={'seller':'vendedor'}, inplace=True)
-df.rename(columns={'index':'indice'}, inplace=True)
-df = df.drop(['postalCode', 'nrOfPictures','powerPS','lastSeen','offerType'], axis=1)
-df = df.dropna(subset=['brand'])
+#df.rename(columns={'seller':'vendedor'}, inplace=True)
+#df.rename(columns={'index':'indice'}, inplace=True)
+#df = df.drop(['postalCode', 'nrOfPictures','powerPS','lastSeen','offerType'], axis=1)
+#df = df.dropna(subset=['brand'])
 
 # Convertir el DataFrame en una lista de diccionarios
 data_save = df.to_dict('records')
@@ -46,8 +46,8 @@ else:
 
 
 # Conexión a MongoDB para realizar la carga de los datos
-loadMongoDB = client['ProyectV1']  # Nombre de la base de datos
-loadCollection = 'healthRead'  # Nombre de la nueva colección
+loadMongoDB = client['ProyectV1Read']  # Nombre de la base de datos
+loadCollection = 'health1'  # Nombre de la nueva colección
 new_mongodb_collection = loadMongoDB[loadCollection]
 
 if loadCollection in loadMongoDB.list_collection_names():
@@ -66,24 +66,3 @@ client.close()
 
 
 print("Los datos se han transferido con éxito .")
-
-
-
-# Guardar los datos transformados en un archivo CSV
-file_path = 'C:/data.csv'
-
-if os.path.isfile(file_path):
-    # Si el archivo existe, cargar los datos existentes en un DataFrame
-    existing_data = pd.read_csv(file_path)
-
-    # Combinar los datos existentes con los nuevos datos
-    updated_data = pd.concat([existing_data, df], ignore_index=True)
-
-    # Guardar el DataFrame actualizado en el archivo
-    updated_data.to_csv(file_path, index=False)
-    
-    print("Archivo actualizado exitosamente.")
-else:
-    # El archivo no existe, descargar o guardar normalmente
-    df.to_csv(file_path, index=False)
-    print("El archivo no existe. Descargando o guardando normalmente...")
